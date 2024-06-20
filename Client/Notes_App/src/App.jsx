@@ -1,19 +1,19 @@
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Signup from './pages/Signup';
-import Login from './pages/Login';
-import Home from './pages/Home';
-
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Signup from './pages/Signup/Signup';
+import Login from './pages/Login/Login';
+import Home from './pages/Home/Home';
+import LandingPage from './pages/Landing/Landing'
+import './App.css'
 function App() {
   return (
     <Router>
-      <Switch>
-        <Route path="/signup" component={Signup} />
-        <Route path="/login" component={Login} />
-        <Route path="/home" component={Home} />
-        <Route path="/" exact component={Home} />
-      </Switch>
+      <Routes>
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<LandingPage />} />
+      </Routes>
     </Router>
   );
 }
-
 export default App;
