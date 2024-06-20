@@ -1,7 +1,6 @@
-// pages/Signup/Signup.js
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import './Signup.scss';
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,16 +14,19 @@ const Signup = () => {
   };
 
   return (
-    <div>
-      <h2>Signup</h2>
+    <div className='signup-page'>
+         <div className="blur1"></div>
+         <div className="blur2"></div>
+         <div className="blur3"></div>
       <form onSubmit={handleSubmit}>
+      <h2>Signup</h2>
         <div>
           <label>Email:</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="email" placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
           <label>Password:</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <input type="password" placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
         <button type="submit">Signup</button>
       </form>

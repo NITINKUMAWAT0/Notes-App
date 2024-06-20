@@ -7,17 +7,17 @@
     justify-content: center;
     text-align: center;
     height: 100vh;
-    position: relative; /* Ensure relative positioning for absolute elements */
+    position: relative; 
   
     .blur1 {
       background: rgba(0, 123, 255, 0.804);
       position: absolute;
       top:0%;
       left: -10%;
-      width: 20%; /* Adjust width to cover the entire landing-container */
-      height: 30%; /* Adjust height to cover the entire landing-container */
+      width: 20%;
+      height: 30%; 
       border-radius: 57%;
-      filter: blur(150px); /* Adjust blur amount as needed */
+      filter: blur(150px);
       z-index: 0;
     }
   
@@ -59,14 +59,14 @@
       }
     }
     .blur2 {
-        background: rgb(0, 123, 255);
+        background: rgba(0, 123, 255, 0.804);
         position: absolute;
         top:35%;
         right: 0%;
-        width: 20%; /* Adjust width to cover the entire landing-container */
-        height: 20%; /* Adjust height to cover the entire landing-container */
+        width: 20%; 
+        height: 20%; 
         border-radius: 70%;
-        filter: blur(180px); /* Adjust blur amount as needed */
+        filter: blur(180px);
         z-index: 0;
       }
     
