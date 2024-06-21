@@ -3,6 +3,7 @@ import "./Home.scss";
 import { FaTrash } from "react-icons/fa";
 
 const Home = () => {
+  // State for managing notes and active note
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
     return savedNotes ? JSON.parse(savedNotes) : [{ id: 1, content: "" }];
@@ -11,9 +12,11 @@ const Home = () => {
     const savedActiveNoteId = localStorage.getItem("activeNoteId");
     return savedActiveNoteId ? JSON.parse(savedActiveNoteId) : 1;
   });
+
+  // Ref for managing text area focus
   const textareaRefs = useRef([]);
 
-  // To keep the text field active...
+  // Effect to focus on active textarea and handle click outside
   useEffect(() => {
     const activeTextarea = textareaRefs.current.find(
       (ref) => ref && ref.dataset.id === activeNoteId.toString()
@@ -36,11 +39,13 @@ const Home = () => {
     };
   }, [activeNoteId]);
 
+  // Effect to save notes to localStorage
   useEffect(() => {
     localStorage.setItem("notes", JSON.stringify(notes));
     localStorage.setItem("activeNoteId", JSON.stringify(activeNoteId));
   }, [notes, activeNoteId]);
 
+  // Function to create a new note
   const handleCreateNote = () => {
     const newNote = { id: notes.length + 1, content: "" };
     const updatedNotes = [...notes, newNote];
@@ -48,6 +53,7 @@ const Home = () => {
     setActiveNoteId(newNote.id);
   };
 
+  // Function to handle note content change
   const handleNoteChange = (id, value) => {
     const updatedNotes = notes.map((note) =>
       note.id === id ? { ...note, content: value } : note
@@ -55,11 +61,12 @@ const Home = () => {
     setNotes(updatedNotes);
   };
 
+  // Function to handle click on a note to make it active
   const handleNoteClick = (id) => {
     setActiveNoteId(id);
   };
 
-  //To delete the existing notes
+  // Function to delete a note
   const handleDeleteNote = (id) => {
     const updatedNotes = notes.filter((note) => note.id !== id);
     setNotes(updatedNotes);
@@ -70,8 +77,10 @@ const Home = () => {
     }
   };
 
+  // Rendering component
   return (
     <div className="home">
+      {/* Sidebar with create button and list of notes */}
       <div className="sidebar">
         <button onClick={handleCreateNote}>Create</button>
         <ul>
@@ -90,15 +99,15 @@ const Home = () => {
           ))}
         </ul>
       </div>
+
+      {/* Display area for notes */}
       <div className="notes">
         {notes.map((note, index) => (
           <textarea
             key={note.id}
             data-id={note.id}
             ref={(el) => (textareaRefs.current[index] = el)}
-            className={`input field ${
-              note.id === activeNoteId ? "active" : ""
-            }`}
+            className={`input field ${note.id === activeNoteId ? "active" : ""}`}
             value={note.content}
             onChange={(e) => handleNoteChange(note.id, e.target.value)}
             style={{ display: note.id === activeNoteId ? "block" : "none" }}
