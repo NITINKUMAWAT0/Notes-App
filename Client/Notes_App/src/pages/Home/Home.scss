@@ -1,0 +1,101 @@
+.home {
+    display: flex;
+  
+    .sidebar {
+      width: 20%;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 20px;
+      background: rgb(50, 50, 50);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  
+      button {
+        border: none;
+        color: white;
+        background: rgb(0, 123, 255);
+        font-size: 15px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+  
+        &:hover {
+          background-color: #0056b3;
+        }
+      }
+  
+      ul {
+        list-style: none;
+        padding: 0;
+        width: 100%;
+  
+        li {
+          padding: 10px;
+          background: rgb(28, 29, 32);
+          color: white;
+          margin-top: 10px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-radius: 5px;
+  
+          &.active {
+            background: rgb(0, 123, 255);
+          }
+  
+          span {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+  
+          .delete-icon {
+            cursor: pointer;
+            font-size: 16px;
+            color: #ffffff;
+            transition: color 0.3s ease;
+  
+            &:hover {
+              color: #cc0000;
+            }
+          }
+  
+          &:hover .delete-icon {
+            color: #cc0000;
+          }
+        }
+      }
+    }
+  
+    .notes {
+      width: 80%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  
+      textarea {
+        width: 100%;
+        height: 90vh;
+        font-size: 18px;
+        border: none;
+        border-radius: 0;
+        background: rgb(28, 29, 32);
+        color: white;
+        padding: 5px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        resize: none;
+        display: none;
+  
+        &.active {
+          display: block;
+        }
+      }
+    }
+  }
+  
