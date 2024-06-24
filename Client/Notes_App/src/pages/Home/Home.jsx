@@ -1,64 +1,65 @@
 import { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import "./Home.scss";
 import { FaTrash } from "react-icons/fa";
 
 const Home = () => {
   // State for managing notes and active note
-  const [notes, setNotes] = useState(() => {
-    const savedNotes = localStorage.getItem("notes");
-    return savedNotes ? JSON.parse(savedNotes) : [{ id: 1, content: "" }];
-  });
-  const [activeNoteId, setActiveNoteId] = useState(() => {
-    const savedActiveNoteId = localStorage.getItem("activeNoteId");
-    return savedActiveNoteId ? JSON.parse(savedActiveNoteId) : 1;
-  });
+  const [notes, setNotes] = useState([]);
+  const [activeNoteId, setActiveNoteId] = useState(null);
 
   // Ref for managing text area focus
   const textareaRefs = useRef([]);
 
-  // Effect to focus on active textarea and handle click outside
+  // Fetch notes from backend on component mount
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/notes");
+        setNotes(response.data);
+        if (response.data.length > 0) {
+          setActiveNoteId(response.data[0].id);
+        }
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      }
+    };
+    fetchNotes();
+  }, []);
+
+  // Effect to focus on active textarea
   useEffect(() => {
     const activeTextarea = textareaRefs.current.find(
-      (ref) => ref && ref.dataset.id === activeNoteId.toString()
+      (ref) => ref && ref.dataset.id === activeNoteId?.toString()
     );
     if (activeTextarea) {
       activeTextarea.focus();
     }
-
-    const handleClickOutside = (event) => {
-      textareaRefs.current.forEach((ref) => {
-        if (ref && !ref.contains(event.target)) {
-          ref.focus();
-        }
-      });
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, [activeNoteId]);
 
-  // Effect to save notes to localStorage
-  useEffect(() => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-    localStorage.setItem("activeNoteId", JSON.stringify(activeNoteId));
-  }, [notes, activeNoteId]);
-
   // Function to create a new note
-  const handleCreateNote = () => {
-    const newNote = { id: notes.length + 1, content: "" };
-    const updatedNotes = [...notes, newNote];
-    setNotes(updatedNotes);
-    setActiveNoteId(newNote.id);
+  const handleCreateNote = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/notes", { content: "" });
+      const newNote = response.data;
+      setNotes([...notes, newNote]);
+      setActiveNoteId(newNote.id);
+    } catch (error) {
+      console.error("Error creating note:", error);
+    }
   };
 
   // Function to handle note content change
-  const handleNoteChange = (id, value) => {
-    const updatedNotes = notes.map((note) =>
-      note.id === id ? { ...note, content: value } : note
-    );
-    setNotes(updatedNotes);
+  const handleNoteChange = async (id, value) => {
+    try {
+      await axios.put(`http://localhost:5000/api/notes/${id}`, { content: value });
+      const updatedNotes = notes.map((note) =>
+        note.id === id ? { ...note, content: value } : note
+      );
+      setNotes(updatedNotes);
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
   };
 
   // Function to handle click on a note to make it active
@@ -67,13 +68,18 @@ const Home = () => {
   };
 
   // Function to delete a note
-  const handleDeleteNote = (id) => {
-    const updatedNotes = notes.filter((note) => note.id !== id);
-    setNotes(updatedNotes);
-    if (activeNoteId === id && updatedNotes.length > 0) {
-      setActiveNoteId(updatedNotes[0].id);
-    } else {
-      setActiveNoteId(null);
+  const handleDeleteNote = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/notes/${id}`);
+      const updatedNotes = notes.filter((note) => note.id !== id);
+      setNotes(updatedNotes);
+      if (updatedNotes.length > 0) {
+        setActiveNoteId(updatedNotes[0].id);
+      } else {
+        setActiveNoteId(null);
+      }
+    } catch (error) {
+      console.error("Error deleting note:", error);
     }
   };
 
