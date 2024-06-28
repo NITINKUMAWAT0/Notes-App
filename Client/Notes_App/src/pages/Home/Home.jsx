@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./Home.scss";
-import { FaTrash } from "react-icons/fa";
+import { FaTrashAlt } from 'react-icons/fa';
+import { AiOutlinePushpin } from 'react-icons/ai';
 
 const Home = () => {
   const [notes, setNotes] = useState([]);
@@ -51,15 +52,17 @@ const Home = () => {
   // Function to handle note updates
   const handleNoteChange = async (id, key, value) => {
     try {
-      const response = await axios.put(
+      const updatedValue = value.trim(); // Trim whitespace from the value
+      const response = await axios.patch(
         `http://localhost:5000/api/notes/${id}`,
         {
-          [key]: value,
+          [key]: updatedValue,
         }
       );
       if (response.data) {
+        // Update notes array with the updated note object
         const updatedNotes = notes.map((note) =>
-          note.id === id ? { ...note, [key]: value } : note
+          note.id === id ? { ...note, [key]: updatedValue } : note
         );
         setNotes(updatedNotes);
       } else {
@@ -108,14 +111,16 @@ const Home = () => {
               className={note.id === activeNoteId ? "active" : ""}
               data-id={note.id}
             >
+              
               <span>{note.title || "New Note"}</span>
-              <FaTrash
+              <FaTrashAlt
                 className="delete-icon"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteNote(note.id);
                 }}
               />
+              <AiOutlinePushpin size={20} className="pin-icon"/>
             </li>
           ))}
         </ul>
@@ -142,18 +147,18 @@ const Home = () => {
             />
             <textarea
               placeholder="Text"
-              data-id={note.id}
-              ref={(el) => (textareaRefs.current[index] = el)}
-              className={`input field ${
-                note.id === activeNoteId ? "active" : ""
-              }`}
               value={note.content}
               onChange={(e) =>
                 handleNoteChange(note.id, "content", e.target.value)
               }
+              className={`input field ${
+                note.id === activeNoteId ? "active" : ""
+              }`}
               style={{
                 display: note.id === activeNoteId ? "block" : "none",
               }}
+              ref={(el) => (textareaRefs.current[index] = el)}
+              data-id={note.id}
             />
           </div>
         ))}
