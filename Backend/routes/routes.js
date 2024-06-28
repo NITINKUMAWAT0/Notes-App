@@ -1,81 +1,165 @@
-const express = require('express');
-const router = express.Router();
-const pool = require('../db/db');
+import { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import "./Home.scss";
+import { FaTrash } from "react-icons/fa";
 
+const Home = () => {
+  const [notes, setNotes] = useState([]);
+  const [activeNoteId, setActiveNoteId] = useState(null);
+  const textareaRefs = useRef([]); // Refs for textareas
+  const titleRefs = useRef([]);    // Refs for title inputs
 
-// GET all notes
-router.get('/', async (req, res) => {
-  try {
-    const [notes] = await pool.query('SELECT * FROM notes');
-    res.json(notes);
-  } catch (error) {
-    console.error('Database query error:', error);
-    res.status(500).json({ error: 'Database query error' });
-  }
-});
+  // Fetch notes from backend on component mount
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/notes");
+        if (response.data) {
+          setNotes(response.data);
+          if (response.data.length > 0) {
+            setActiveNoteId(response.data[0].id);
+          }
+        } else {
+          console.error("Empty response data received.");
+        }
+      } catch (error) {
+        console.error("Error fetching notes:", error.message);
+      }
+    };
+    fetchNotes();
+  }, []);
 
-// GET note by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const [notes] = await pool.query('SELECT * FROM notes WHERE id = ?', [req.params.id]);
-    if (notes.length > 0) {
-      res.json(notes[0]);
-    } else {
-      res.status(404).json({ error: 'Note not found' });
+  // Function to create a new note
+  const handleCreateNote = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/notes", {
+        title: "",
+        content: "",
+      });
+      if (response.data) {
+        const newNote = response.data;
+        setNotes([...notes, newNote]);
+        setActiveNoteId(newNote.id);
+      } else {
+        console.error("Empty response data received.");
+      }
+    } catch (error) {
+      console.error("Error creating note:", error.message);
     }
-  } catch (error) {
-    console.error('Database query error:', error);
-    res.status(500).json({ error: 'Database query error' });
-  }
-});
+  };
 
-// CREATE a new note
-router.post('/', async (req, res) => {
-  try {
-    const { title, content } = req.body;
-    const [result] = await pool.query('INSERT INTO notes (title, content) VALUES (?, ?)', [title, content]);
-    res.status(201).json({ id: result.insertId, title, content });
-  } catch (error) {
-    console.error('Database insert error:', error);
-    res.status(500).json({ error: 'Database insert error' });
-  }
-});
-
-// UPDATE note by ID
-router.put('/:id', async (req, res) => {
-  const { id } = req.params;
-  const { title, content } = req.body;
-  
-  try {
-    const [result] = await pool.query(
-      'UPDATE notes SET title = ?, content = ? WHERE id = ?',
-      [title, content, id]
-    );
-    
-    if (result.affectedRows > 0) {
-      res.json({ id, title, content });
-    } else {
-      res.status(404).json({ error: 'Note not found' });
+  // Function to handle note updates
+  const handleNoteChange = async (id, key, value) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/notes/${id}`,
+        {
+          [key]: value, // Ensure both title and content are sent correctly
+        }
+      );
+      if (response.data) {
+        const updatedNotes = notes.map((note) =>
+          note.id === id ? { ...note, [key]: value } : note
+        );
+        setNotes(updatedNotes);
+      } else {
+        console.error("Empty response data received.");
+      }
+    } catch (error) {
+      console.error(`Error updating note ${key}:`, error.message);
     }
-  } catch (error) {
-    console.error('Database update error:', error);
-    res.status(500).json({ error: 'Database update error' });
-  }
-});
+  };
 
-// DELETE note by ID
-router.delete('/:id', async (req, res) => {
-  try {
-    const [result] = await pool.query('DELETE FROM notes WHERE id = ?', [req.params.id]);
-    if (result.affectedRows > 0) {
-      res.json({ message: 'Note deleted' });
-    } else {
-      res.status(404).json({ error: 'Note not found' });
+  // Function to handle note deletion
+  const handleDeleteNote = async (id) => {
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/notes/${id}`);
+      if (response.data && response.status === 200) {
+        const updatedNotes = notes.filter((note) => note.id !== id);
+        setNotes(updatedNotes);
+        if (updatedNotes.length > 0) {
+          setActiveNoteId(updatedNotes[0].id);
+        } else {
+          setActiveNoteId(null);
+        }
+      } else {
+        console.error("Invalid response received.");
+      }
+    } catch (error) {
+      console.error("Error deleting note:", error.message);
     }
-  } catch (error) {
-    console.error('Database delete error:', error);
-    res.status(500).json({ error: 'Database delete error' });
-  }
-});
+  };
 
-module.exports = router;
+  // Function to handle click on a note to make it active
+  const handleNoteClick = (id) => {
+    setActiveNoteId(id);
+  };
+
+  return (
+    <div className="home">
+      {/* Sidebar with create button and list of notes */}
+      <div className="sidebar">
+        <button onClick={handleCreateNote}>Create</button>
+        <ul>
+          {notes.map((note, index) => (
+            <li
+              key={note.id}
+              onClick={() => handleNoteClick(note.id)}
+              className={note.id === activeNoteId ? "active" : ""}
+              data-id={note.id}
+            >
+              <span>{note.title || "New Note"}</span>
+              <FaTrash
+                className="delete-icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteNote(note.id);
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Display area for notes */}
+      <div className="notes">
+        {notes.map((note, index) => (
+          <div
+            key={note.id}
+            className={`note ${note.id === activeNoteId ? "active" : ""}`}
+            style={{ display: note.id === activeNoteId ? "block" : "none" }}
+          >
+            <input
+              type="text"
+              placeholder="Title"
+              value={note.title}
+              onChange={(e) =>
+                handleNoteChange(note.id, "title", e.target.value)
+              }
+              className="title-input"
+              ref={(el) => (titleRefs.current[index] = el)}
+              data-id={note.id}
+            />
+            <textarea
+              placeholder="Text"
+              data-id={note.id}
+              ref={(el) => (textareaRefs.current[index] = el)}
+              className={`input field ${
+                note.id === activeNoteId ? "active" : ""
+              }`}
+              value={note.content}
+              onChange={(e) =>
+                handleNoteChange(note.id, "content", e.target.value)
+              }
+              style={{
+                display: note.id === activeNoteId ? "block" : "none",
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Home;

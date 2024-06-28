@@ -4,36 +4,30 @@ import "./Home.scss";
 import { FaTrash } from "react-icons/fa";
 
 const Home = () => {
-  const [notes, setNotes] = useState([]); // State for managing notes
-  const [activeNoteId, setActiveNoteId] = useState(null); // State for managing active note
-  const textareaRefs = useRef([]); // Ref for managing text area focus
-  const titleRefs = useRef([]); // Ref for managing title input focus
+  const [notes, setNotes] = useState([]);
+  const [activeNoteId, setActiveNoteId] = useState(null);
+  const textareaRefs = useRef([]);
+  const titleRefs = useRef([]);
 
   // Fetch notes from backend on component mount
   useEffect(() => {
     const fetchNotes = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/notes");
-        setNotes(response.data);
-        if (response.data.length > 0) {
-          setActiveNoteId(response.data[0].id); // Set the active note to the first note if notes exist
+        if (response.data) {
+          setNotes(response.data);
+          if (response.data.length > 0) {
+            setActiveNoteId(response.data[0].id);
+          }
+        } else {
+          console.error("Empty response data received.");
         }
       } catch (error) {
-        console.error("Error fetching notes:", error);
+        console.error("Error fetching notes:", error.message);
       }
     };
     fetchNotes();
   }, []);
-
-  // Effect to focus on active input (title or textarea) when activeNoteId changes
-  useEffect(() => {
-    const activeTitleInput = titleRefs.current.find(
-      (ref) => ref && ref.dataset.id === activeNoteId?.toString()
-    );
-    if (activeTitleInput) {
-      activeTitleInput.focus(); // Focus on the active title input
-    }
-  }, [activeNoteId]);
 
   // Function to create a new note
   const handleCreateNote = async () => {
@@ -42,48 +36,63 @@ const Home = () => {
         title: "",
         content: "",
       });
-      const newNote = response.data;
-      setNotes([...notes, newNote]); // Add the new note to the notes array
-      setActiveNoteId(newNote.id); // Set the active note to the newly created note
-    } catch (error) {
-      console.error("Error creating note:", error);
-    }
-  };
-
-  const handleNoteChange = async (id, key, value) => {
-    try {
-      console.log('Updating note:', id, key, value);
-      const response = await axios.put(`http://localhost:5000/api/notes/${id}`, { [key]: value });
-      console.log('Response:', response.data); // Log response data
-      const updatedNotes = notes.map((note) =>
-        note.id === id ? { ...note, [key]: value } : note
-      );
-      setNotes(updatedNotes);
-    } catch (error) {
-      console.error(`Error updating note ${key}:`, error);
-    }
-  };
-  
-  
-  // Function to handle click on a note to make it active
-  const handleNoteClick = (id) => {
-    setActiveNoteId(id); // Set the active note to the clicked note
-  };
-
-  // Function to delete a note
-  const handleDeleteNote = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/notes/${id}`);
-      const updatedNotes = notes.filter((note) => note.id !== id);
-      setNotes(updatedNotes); // Update the notes array by removing the deleted note
-      if (updatedNotes.length > 0) {
-        setActiveNoteId(updatedNotes[0].id); // Set the active note to the first note if notes exist
+      if (response.data) {
+        const newNote = response.data;
+        setNotes([...notes, newNote]);
+        setActiveNoteId(newNote.id);
       } else {
-        setActiveNoteId(null); // Set activeNoteId to null if no notes are left
+        console.error("Empty response data received.");
       }
     } catch (error) {
-      console.error("Error deleting note:", error);
+      console.error("Error creating note:", error.message);
     }
+  };
+
+  // Function to handle note updates
+  const handleNoteChange = async (id, key, value) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/notes/${id}`,
+        {
+          [key]: value,
+        }
+      );
+      if (response.data) {
+        const updatedNotes = notes.map((note) =>
+          note.id === id ? { ...note, [key]: value } : note
+        );
+        setNotes(updatedNotes);
+      } else {
+        console.error("Empty response data received.");
+      }
+    } catch (error) {
+      console.error(`Error updating note ${key}:`, error.message);
+    }
+  };
+
+  // Function to handle note deletion
+  const handleDeleteNote = async (id) => {
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/notes/${id}`);
+      if (response.data && response.status === 200) {
+        const updatedNotes = notes.filter((note) => note.id !== id);
+        setNotes(updatedNotes);
+        if (updatedNotes.length > 0) {
+          setActiveNoteId(updatedNotes[0].id);
+        } else {
+          setActiveNoteId(null);
+        }
+      } else {
+        console.error("Invalid response received.");
+      }
+    } catch (error) {
+      console.error("Error deleting note:", error.message);
+    }
+  };
+
+  // Function to handle click on a note to make it active
+  const handleNoteClick = (id) => {
+    setActiveNoteId(id);
   };
 
   return (
@@ -124,7 +133,9 @@ const Home = () => {
               type="text"
               placeholder="Title"
               value={note.title}
-              onChange={(e) => handleNoteChange(note.id, "title", e.target.value)}
+              onChange={(e) =>
+                handleNoteChange(note.id, "title", e.target.value)
+              }
               className="title-input"
               ref={(el) => (titleRefs.current[index] = el)}
               data-id={note.id}
@@ -133,10 +144,16 @@ const Home = () => {
               placeholder="Text"
               data-id={note.id}
               ref={(el) => (textareaRefs.current[index] = el)}
-              className={`input field ${note.id === activeNoteId ? "active" : ""}`}
+              className={`input field ${
+                note.id === activeNoteId ? "active" : ""
+              }`}
               value={note.content}
-              onChange={(e) => handleNoteChange(note.id, "content", e.target.value)}
-              style={{ display: note.id === activeNoteId ? "block" : "none" }}
+              onChange={(e) =>
+                handleNoteChange(note.id, "content", e.target.value)
+              }
+              style={{
+                display: note.id === activeNoteId ? "block" : "none",
+              }}
             />
           </div>
         ))}
