@@ -62,12 +62,17 @@
           &:hover {
             color: #cc0000;
           }
-          }
-          .pin-icon{
-            margin-left: 10px;
-            cursor: pointer;
-            color: #ffffff;
+        }
+
+        .pin-icon {
+          margin-left: 10px;
+          cursor: pointer;
+          color: #ffffff;
           transition: color 0.3s ease;
+
+          &.pinned {
+            color: gold;
+          }
 
           &:hover {
             color: #cc0000;

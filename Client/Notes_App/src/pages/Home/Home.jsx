@@ -16,9 +16,11 @@ const Home = () => {
       try {
         const response = await axios.get("http://localhost:5000/api/notes");
         if (response.data) {
-          setNotes(response.data);
-          if (response.data.length > 0) {
-            setActiveNoteId(response.data[0].id);
+          // Sort notes by pinned status (pinned notes first)
+          const sortedNotes = response.data.sort((a, b) => b.pinned - a.pinned);
+          setNotes(sortedNotes);
+          if (sortedNotes.length > 0) {
+            setActiveNoteId(sortedNotes[0].id);
           }
         } else {
           console.error("Empty response data received.");
@@ -39,7 +41,8 @@ const Home = () => {
       });
       if (response.data) {
         const newNote = response.data;
-        setNotes([...notes, newNote]);
+        // Add new note to the beginning of the array (pinned notes first)
+        setNotes([newNote, ...notes]);
         setActiveNoteId(newNote.id);
       } else {
         console.error("Empty response data received.");
@@ -93,6 +96,27 @@ const Home = () => {
     }
   };
 
+  // Function to handle note pinning
+  const handlePinNote = async (id, isPinned) => {
+    try {
+      const response = await axios.patch(`http://localhost:5000/api/notes/${id}`, {
+        pinned: !isPinned,
+      });
+      if (response.data) {
+        const updatedNotes = notes.map((note) =>
+          note.id === id ? { ...note, pinned: !isPinned } : note
+        );
+        // Sort notes to keep pinned notes at the top
+        updatedNotes.sort((a, b) => b.pinned - a.pinned);
+        setNotes(updatedNotes);
+      } else {
+        console.error("Empty response data received.");
+      }
+    } catch (error) {
+      console.error("Error pinning note:", error.message);
+    }
+  };
+
   // Function to handle click on a note to make it active
   const handleNoteClick = (id) => {
     setActiveNoteId(id);
@@ -111,7 +135,6 @@ const Home = () => {
               className={note.id === activeNoteId ? "active" : ""}
               data-id={note.id}
             >
-              
               <span>{note.title || "New Note"}</span>
               <FaTrashAlt
                 className="delete-icon"
@@ -120,7 +143,14 @@ const Home = () => {
                   handleDeleteNote(note.id);
                 }}
               />
-              <AiOutlinePushpin size={20} className="pin-icon"/>
+              <AiOutlinePushpin
+                size={20}
+                className={`pin-icon ${note.pinned ? 'pinned' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePinNote(note.id, note.pinned);
+                }}
+              />
             </li>
           ))}
         </ul>

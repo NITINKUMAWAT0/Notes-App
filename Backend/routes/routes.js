@@ -5,7 +5,7 @@ const pool = require('../db/db');
 // GET all notes
 router.get('/', async (req, res) => {
   try {
-    const [notes] = await pool.query('SELECT * FROM notes');
+    const [notes] = await pool.query('SELECT * FROM notes ORDER BY pinned DESC');
     res.json(notes);
   } catch (error) {
     console.error('Database query error:', error);
@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
   try {
     const { title, content } = req.body;
     const [result] = await pool.query('INSERT INTO notes (title, content) VALUES (?, ?)', [title, content]);
-    res.status(201).json({ id: result.insertId, title, content });
+    res.status(201).json({ id: result.insertId, title, content, pinned: false });
   } catch (error) {
     console.error('Database insert error:', error);
     res.status(500).json({ error: 'Database insert error' });
@@ -43,25 +43,15 @@ router.post('/', async (req, res) => {
 // UPDATE note by ID (using PATCH)
 router.patch('/:id', async (req, res) => {
   const { id } = req.params;
-  const { title, content } = req.body;
+  const { title, content, pinned } = req.body;
 
   try {
-    if (!title && !content) {
-      return res.status(400).json({ error: 'Title or content must be provided' });
-    }
-
     const updates = {};
-    if (title !== undefined) {
-      updates.title = title;
-    }
-    if (content !== undefined) {
-      updates.content = content;
-    }
+    if (title !== undefined) updates.title = title;
+    if (content !== undefined) updates.content = content;
+    if (pinned !== undefined) updates.pinned = pinned;
 
-    const [result] = await pool.query(
-      'UPDATE notes SET ? WHERE id = ?',
-      [updates, id]
-    );
+    const [result] = await pool.query('UPDATE notes SET ? WHERE id = ?', [updates, id]);
 
     if (result.affectedRows > 0) {
       const updatedNote = { id, ...updates };
