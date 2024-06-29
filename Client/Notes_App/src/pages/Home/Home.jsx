@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./Home.scss";
 import { FaTrashAlt } from 'react-icons/fa';
-import { AiOutlinePushpin } from 'react-icons/ai';
+import { AiOutlinePushpin, AiOutlineInfoCircle } from 'react-icons/ai';
 
 const Home = () => {
   const [notes, setNotes] = useState([]);
@@ -55,7 +55,7 @@ const Home = () => {
   // Function to handle note updates
   const handleNoteChange = async (id, key, value) => {
     try {
-      const updatedValue = value.trim(); // Trim whitespace from the value
+      const updatedValue = value; // Ensure no trimming is done here
       const response = await axios.patch(
         `http://localhost:5000/api/notes/${id}`,
         {
@@ -75,6 +75,7 @@ const Home = () => {
       console.error(`Error updating note ${key}:`, error.message);
     }
   };
+  
 
   // Function to handle note deletion
   const handleDeleteNote = async (id) => {
@@ -151,6 +152,7 @@ const Home = () => {
                   handlePinNote(note.id, note.pinned);
                 }}
               />
+              <AiOutlineInfoCircle size={20} className="info"/>
             </li>
           ))}
         </ul>
