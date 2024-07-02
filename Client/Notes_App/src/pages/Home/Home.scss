@@ -1,6 +1,6 @@
 .home {
   display: flex;
-
+  
   .sidebar {
     width: 20%;
     height: 100vh;
@@ -41,6 +41,8 @@
         justify-content: space-between;
         align-items: center;
         border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
 
         &.active {
           background: rgb(0, 123, 255);
@@ -78,14 +80,16 @@
             color: #1eb300;
           }
         }
-        .info{
-          margin-left:10px;
+
+        .info {
+          margin-left: 10px;
           cursor: pointer;
+          transition: color 0.3s ease;
+
           &:hover {
             color: #ffea02;
           }
         }
-
       }
     }
   }
@@ -96,11 +100,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-
+    border-radius: 10px;
+    box-shadow: rgba(50, 50, 50, 0.5) 0px 4px 8px;
+    
     .note {
       width: 100%;
       display: none;
       flex-direction: column;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      padding: 10px;
+      background: white;
 
       &.active {
         display: flex;
@@ -109,26 +119,22 @@
       .title-input {
         width: 100%;
         padding: 10px;
-        font-size: 24px; /* Larger font size for the title */
+        font-size: 24px;
         border: none;
-        background: rgb(28, 29, 32);
-        color: white;
-        margin-bottom: 0; /* Remove the margin-bottom */
+        margin-bottom: 0;
         box-sizing: border-box;
 
         &:focus {
-          outline: none; /* Remove the default focus outline */
+          outline: none;
         }
       }
 
       textarea {
         padding-top: 0px;
         width: 100%;
-        height: 80vh;
+        height: 20vh;
         font-size: 18px;
         border: none;
-        background: rgb(28, 29, 32);
-        color: white;
         padding: 10px;
         box-sizing: border-box;
         overflow-y: auto;
@@ -136,7 +142,97 @@
         flex: 1;
 
         &:focus {
-          outline: none; /* Remove the default focus outline */
+          outline: none;
+        }
+      }
+    }
+  }
+
+  .AllTexts {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+
+    button {
+      border: none;
+      color: white;
+      background: rgb(0, 123, 255);
+      font-size: 15px;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+
+      li {
+        padding: 10px;
+        background: rgb(28, 29, 32);
+        color: white;
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+
+        &.active {
+          background: rgb(0, 123, 255);
+        }
+
+        span {
+          flex: 1;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .delete-icon {
+          cursor: pointer;
+          font-size: 16px;
+          color: #ffffff;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: #cc0000;
+          }
+        }
+
+        .pin-icon {
+          margin-left: 10px;
+          cursor: pointer;
+          color: #ffffff;
+          transition: color 0.3s ease;
+
+          &.pinned {
+            color: gold;
+          }
+
+          &:hover {
+            color: #1eb300;
+          }
+        }
+
+        .info {
+          margin-left: 10px;
+          cursor: pointer;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: #ffea02;
+          }
         }
       }
     }

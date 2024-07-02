@@ -127,39 +127,12 @@ const Home = () => {
     <div className="home">
       {/* Sidebar with create button and list of notes */}
       <div className="sidebar">
-        <button onClick={handleCreateNote}>Create</button>
-        <ul>
-          {notes.map((note) => (
-            <li
-              key={note.id}
-              onClick={() => handleNoteClick(note.id)}
-              className={note.id === activeNoteId ? "active" : ""}
-              data-id={note.id}
-            >
-              <span>{note.title || "New Note"}</span>
-              <FaTrashAlt
-                className="delete-icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteNote(note.id);
-                }}
-              />
-              <AiOutlinePushpin
-                size={20}
-                className={`pin-icon ${note.pinned ? 'pinned' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePinNote(note.id, note.pinned);
-                }}
-              />
-              <AiOutlineInfoCircle size={20} className="info"/>
-            </li>
-          ))}
-        </ul>
+       
       </div>
 
       {/* Display area for notes */}
       <div className="notes">
+        <div className="text area">
         {notes.map((note, index) => (
           <div
             key={note.id}
@@ -194,6 +167,40 @@ const Home = () => {
             />
           </div>
         ))}
+      </div>
+
+      {/* All notes */}
+      <div className="AllTexts">
+      <button onClick={handleCreateNote}>Create</button>
+        <ul>
+          {notes.map((note) => (
+            <li
+              key={note.id}
+              onClick={() => handleNoteClick(note.id)}
+              className={note.id === activeNoteId ? "active" : ""}
+              data-id={note.id}
+            >
+              <span>{note.title || "New Note"}</span>
+              <FaTrashAlt
+                className="delete-icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteNote(note.id);
+                }}
+              />
+              <AiOutlinePushpin
+                size={20}
+                className={`pin-icon ${note.pinned ? 'pinned' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePinNote(note.id, note.pinned);
+                }}
+              />
+              <AiOutlineInfoCircle size={20} className="info"/>
+            </li>
+          ))}
+        </ul>
+      </div>
       </div>
     </div>
   );
