@@ -1,0 +1,66 @@
+$sidebar-bg-color: #ffffff;
+$link-color: #000000;
+$link-hover-color: #ffffff;
+$link-active-color: #000000;
+$link-active-bg-color: #fce8b2;
+
+.sidebar {
+  background-color: $sidebar-bg-color;
+  width: 250px; /* Default width */
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+  a {
+    display: flex;
+    align-items: center;
+    color: $link-color;
+    text-decoration: none;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 25px;
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+      background-color: $link-hover-color;
+      color: $link-color;
+    }
+
+    &.active-link {
+      background-color: $link-active-bg-color;
+      color: $link-active-color;
+    }
+
+    .icon {
+      margin-right: 15px; /* Space between the icon and text */
+    }
+  }
+}
+
+/* Media Queries for Tablets and Mobile Devices */
+
+/* For tablets and mobile phones */
+@media (max-width: 820px) {
+  .sidebar {
+    width: 10%; /* Set sidebar width to 10% on tablets and mobile phones */
+    position: fixed; /* Ensure it stays fixed */
+    top: 0;
+    left: 0;
+    margin-top:85px;
+    height:80vh; /* Keep the sidebar height full */
+    padding: 10px; /* Adjust padding */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for better visibility */
+    overflow-x: hidden; /* Hide overflow */
+  }
+
+  .sidebar a {
+    font-size: 14px; /* Adjust font size for smaller sidebar */
+    margin: 8px 0; /* Adjust margin */
+    padding: 8px; /* Adjust padding */
+    
+    .icon {
+      margin-right: 8px; /* Adjust icon spacing */
+    }
+  }
+}

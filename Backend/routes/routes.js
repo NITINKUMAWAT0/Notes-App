@@ -32,8 +32,16 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { title, content } = req.body;
-    const [result] = await pool.query('INSERT INTO notes (title, content) VALUES (?, ?)', [title, content]);
-    res.status(201).json({ id: result.insertId, title, content, pinned: false });
+    const [result] = await pool.query(
+      'INSERT INTO notes (title, content, pinned) VALUES (?, ?, false)',
+      [title, content]
+    );
+    res.status(201).json({
+      id: result.insertId,
+      title,
+      content,
+      pinned: false
+    });
   } catch (error) {
     console.error('Database insert error:', error);
     res.status(500).json({ error: 'Database insert error' });

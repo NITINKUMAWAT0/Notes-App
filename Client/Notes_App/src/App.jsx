@@ -1,21 +1,25 @@
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Signup from './pages/Signup/Signup';
-import Login from './pages/Login/Login';
 import Home from './pages/Home/Home';
-import LandingPage from './pages/Landing/Landing'
-import Archives from './pages/Archives/Archives';
-import './App.css'
+import Navbar from './Components/Navbar/Navbar';
+import Sidebar from './Components/Sidebar/Sidebar'; // Import the Sidebar component
+
+import './App.css';
+
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/archives" element={<Archives/>}/>
-        <Route path="/" element={<LandingPage />} />
-      </Routes>
+      <Navbar />
+      <div className="app-layout">
+        <Sidebar /> {/* Add Sidebar here */}
+        <div className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+          </Routes>
+        </div>
+      </div>
     </Router>
   );
 }
+
 export default App;

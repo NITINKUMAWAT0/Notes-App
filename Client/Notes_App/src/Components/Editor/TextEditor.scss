@@ -1,0 +1,21 @@
+/* TextEditor.css */
+
+.ql-container {
+    border: 1px solid #ffffff; /* Custom border */
+    border-radius: 5px; /* Rounded corners */
+  }
+  
+  .ql-editor {
+    min-height: 150px; /* Minimum height */
+    background-color: #ffffff; /* Custom background color */
+    color: #333; /* Custom text color */
+    font-family: Arial, sans-serif; /* Custom font */
+    padding: 10px; /* Custom padding */
+  }
+  
+  .ql-toolbar {
+    background-color: #ffffff; /* Custom toolbar background */
+    border:none ;/* Custom toolbar border */
+    border-bottom: none; /* Remove bottom border * /* Rounded top corners */
+  }
+  
